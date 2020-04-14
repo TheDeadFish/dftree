@@ -23,7 +23,9 @@ node_cmp(const node_t *a, const node_t *b) {
 }
 
 typedef rb_tree(node_t) tree_t;
-rb_gen(static, tree_, tree_t, node_t, link, node_cmp);
+
+
+#include "rb-x-x.cc"
 
 
 node_s nodes[10000];
