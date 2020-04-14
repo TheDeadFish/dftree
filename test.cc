@@ -4,6 +4,7 @@
 #define RB_COMPACT
 #include "rb.h"
 #include "stuff.h"
+#include "dftree.h"
 
 struct node_s {
 	dfnode link;
@@ -15,13 +16,13 @@ struct node_s {
 
 
 static int
-node_cmp(const node_s *a, const node_s *b) {
+node_cmp_(const node_s *a, const node_s *b) {
 	return a->key - b->key;
 }
 
 static int
 node_cmp(const dfnode *a, const dfnode *b) {
-	return node_cmp(node_s::get(a), node_s::get(b));
+	return node_cmp_(node_s::get(a), node_s::get(b));
 }
 
 
@@ -59,7 +60,8 @@ int main()
 	tree_new(&tree);
 	for(int i = 0; i < 20; i++) {
 		nodes[i].key = i*10;
-		tree_insert(&tree, &nodes[i].link);
+		
+		dftree_insert(&tree, &nodes[i].link, COMPAR(node_cmp));
 	}
 	
 	traversi(tree.rbt_root, 0);
