@@ -3,26 +3,26 @@
 
 #define RB_COMPACT
 #include "rb.h"
-
-typedef struct node_s node_t;
+#include "stuff.h"
 
 struct node_s {
-	rb_node(node_t) link;
+	dfnode link;
 	
-	node_s* left() { return link.rbn_left; }
-	node_s* right() { return (node_s*)(intptr_t(
-		link.rbn_right_red) & ((ssize_t)-2)); }
-	
+	static node_s* get(const dfnode* x) { return 
+		container_of((dfnode*)x, &node_s::link); }
 	int key;
 };
 
 
 static int
-node_cmp(const node_t *a, const node_t *b) {
+node_cmp(const node_s *a, const node_s *b) {
 	return a->key - b->key;
 }
 
-typedef rb_tree(node_t) tree_t;
+static int
+node_cmp(const dfnode *a, const dfnode *b) {
+	return node_cmp(node_s::get(a), node_s::get(b));
+}
 
 
 #include "rb-x-x.cc"
@@ -30,13 +30,15 @@ typedef rb_tree(node_t) tree_t;
 
 node_s nodes[10000];
 
-void traversi(node_s* node, int depth)
+void traversi(dfnode* node, int depth)
 {
 	if(node == NULL) return;
-	printf("%d : %d\n", depth, node->key);
+	printf("%d : %d\n", depth, node_s::get(node)->key);
 	
-	traversi(node->left(), depth+1);
-	traversi(node->right(), depth+1);
+		
+	
+	traversi(node->rbn_left, depth+1);
+	traversi(node->right_get(), depth+1);
 	
 	
 	
@@ -53,11 +55,11 @@ int main()
 
 
 
-	tree_t tree;
+	dftree tree;
 	tree_new(&tree);
 	for(int i = 0; i < 20; i++) {
 		nodes[i].key = i*10;
-		tree_insert(&tree, &nodes[i]);
+		tree_insert(&tree, &nodes[i].link);
 	}
 	
 	traversi(tree.rbt_root, 0);
