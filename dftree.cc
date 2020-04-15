@@ -7,37 +7,37 @@
 
 
 /* Internal utility macros. */
-#define rbtn_first(dfnode, a_field, a_rbt, a_root, r_node) do {		\
+#define rbtn_first(a_rbt, a_root, r_node) do {		\
     (r_node) = (a_root);						\
     if ((r_node) != NULL) {						\
 	for (;								\
-	  rbtn_left_get(dfnode, a_field, (r_node)) != NULL;		\
-	  (r_node) = rbtn_left_get(dfnode, a_field, (r_node))) {	\
+	  rbtn_left_get((r_node)) != NULL;		\
+	  (r_node) = rbtn_left_get((r_node))) {	\
 	}								\
     }									\
 } while (0)
 
-#define rbtn_last(dfnode, a_field, a_rbt, a_root, r_node) do {		\
+#define rbtn_last(a_rbt, a_root, r_node) do {		\
     (r_node) = (a_root);						\
     if ((r_node) != NULL) {						\
-	for (; rbtn_right_get(dfnode, a_field, (r_node)) != NULL;	\
-	  (r_node) = rbtn_right_get(dfnode, a_field, (r_node))) {	\
+	for (; rbtn_right_get((r_node)) != NULL;	\
+	  (r_node) = rbtn_right_get((r_node))) {	\
 	}								\
     }									\
 } while (0)
 
-#define rbtn_rotate_left(dfnode, a_field, a_node, r_node) do {		\
-    (r_node) = rbtn_right_get(dfnode, a_field, (a_node));		\
-    rbtn_right_set(dfnode, a_field, (a_node),				\
-      rbtn_left_get(dfnode, a_field, (r_node)));			\
-    rbtn_left_set(dfnode, a_field, (r_node), (a_node));			\
+#define rbtn_rotate_left(a_node, r_node) do {		\
+    (r_node) = rbtn_right_get((a_node));		\
+    rbtn_right_set((a_node),				\
+      rbtn_left_get((r_node)));			\
+    rbtn_left_set((r_node), (a_node));			\
 } while (0)
 
-#define rbtn_rotate_right(dfnode, a_field, a_node, r_node) do {		\
-    (r_node) = rbtn_left_get(dfnode, a_field, (a_node));		\
-    rbtn_left_set(dfnode, a_field, (a_node),				\
-      rbtn_right_get(dfnode, a_field, (r_node)));			\
-    rbtn_right_set(dfnode, a_field, (r_node), (a_node));		\
+#define rbtn_rotate_right(a_node, r_node) do {		\
+    (r_node) = rbtn_left_get((a_node));		\
+    rbtn_left_set((a_node),				\
+      rbtn_right_get((r_node)));			\
+    rbtn_right_set((r_node), (a_node));		\
 } while (0)
 
 
@@ -57,9 +57,9 @@ bool dftree_insert(dftree *rbtree,
 		int cmp = pathp->cmp = key_cmp(knode, pathp->node);
 		if(cmp == 0) return false;
 		if (cmp < 0) {
-			pathp[1].node = rbtn_left_get(dfnode, link, pathp->node);
+			pathp[1].node = rbtn_left_get(pathp->node);
 		} else {
-			pathp[1].node = rbtn_right_get(dfnode, link, pathp->node);
+			pathp[1].node = rbtn_right_get(pathp->node);
 		}
 	}
 	
@@ -73,14 +73,14 @@ bool dftree_insert(dftree *rbtree,
 		dfnode *cnode = pathp->node;
 		if (pathp->cmp < 0) {
 			dfnode *left = pathp[1].node;
-			rbtn_left_set(dfnode, link, cnode, left);
-			if (rbtn_red_get(dfnode, link, left)) {
-				dfnode *leftleft = rbtn_left_get(dfnode, link, left);
-				if (leftleft != NULL && rbtn_red_get(dfnode, link, leftleft)) {
+			rbtn_left_set(cnode, left);
+			if (rbtn_red_get(left)) {
+				dfnode *leftleft = rbtn_left_get(left);
+				if (leftleft != NULL && rbtn_red_get(leftleft)) {
 
 					dfnode *tnode;
-					rbtn_black_set(dfnode, link, leftleft);
-					rbtn_rotate_right(dfnode, link, cnode, tnode);
+					rbtn_black_set(leftleft);
+					rbtn_rotate_right(cnode, tnode);
 					cnode = tnode;
 				}
 			} else {
@@ -88,21 +88,21 @@ bool dftree_insert(dftree *rbtree,
 			}
 		} else {
 			dfnode *right = pathp[1].node;
-			rbtn_right_set(dfnode, link, cnode, right);
-			if (rbtn_red_get(dfnode, link, right)) {
-				dfnode *left = rbtn_left_get(dfnode, link, cnode);
-				if (left != NULL && rbtn_red_get(dfnode, link, left)) {
+			rbtn_right_set(cnode, right);
+			if (rbtn_red_get(right)) {
+				dfnode *left = rbtn_left_get(cnode);
+				if (left != NULL && rbtn_red_get(left)) {
 
-					rbtn_black_set(dfnode, link, left);
-					rbtn_black_set(dfnode, link, right);
-					rbtn_red_set(dfnode, link, cnode);
+					rbtn_black_set(left);
+					rbtn_black_set(right);
+					rbtn_red_set(cnode);
 				} else {
 
 					dfnode *tnode;
-					bool tred = rbtn_red_get(dfnode, link, cnode);
-					rbtn_rotate_left(dfnode, link, cnode, tnode);
-					rbtn_color_set(dfnode, link, tnode, tred);
-					rbtn_red_set(dfnode, link, cnode);
+					bool tred = rbtn_red_get(cnode);
+					rbtn_rotate_left(cnode, tnode);
+					rbtn_color_set(tnode, tred);
+					rbtn_red_set(cnode);
 					cnode = tnode;
 				}
 			} else {
@@ -113,6 +113,6 @@ bool dftree_insert(dftree *rbtree,
 	}
 
 	rbtree->rbt_root = path->node;
-	rbtn_black_set(dfnode, link, rbtree->rbt_root);
+	rbtn_black_set(rbtree->rbt_root);
 	return true;
 };

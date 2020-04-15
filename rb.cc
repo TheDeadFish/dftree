@@ -1,36 +1,36 @@
 
 /* Internal utility macros. */
-#define rbtn_first(dfnode, a_field, a_rbt, a_root, r_node) do {		\
+#define rbtn_first(a_rbt, a_root, r_node) do {		\
     (r_node) = (a_root);						\
     if ((r_node) != NULL) {						\
 	for (;								\
-	  rbtn_left_get(dfnode, a_field, (r_node)) != NULL;		\
-	  (r_node) = rbtn_left_get(dfnode, a_field, (r_node))) {	\
+	  rbtn_left_get((r_node)) != NULL;		\
+	  (r_node) = rbtn_left_get((r_node))) {	\
 	}								\
     }									\
 } while (0)
 
-#define rbtn_last(dfnode, a_field, a_rbt, a_root, r_node) do {		\
+#define rbtn_last(a_rbt, a_root, r_node) do {		\
     (r_node) = (a_root);						\
     if ((r_node) != NULL) {						\
-	for (; rbtn_right_get(dfnode, a_field, (r_node)) != NULL;	\
-	  (r_node) = rbtn_right_get(dfnode, a_field, (r_node))) {	\
+	for (; rbtn_right_get((r_node)) != NULL;	\
+	  (r_node) = rbtn_right_get((r_node))) {	\
 	}								\
     }									\
 } while (0)
 
-#define rbtn_rotate_left(dfnode, a_field, a_node, r_node) do {		\
-    (r_node) = rbtn_right_get(dfnode, a_field, (a_node));		\
-    rbtn_right_set(dfnode, a_field, (a_node),				\
-      rbtn_left_get(dfnode, a_field, (r_node)));			\
-    rbtn_left_set(dfnode, a_field, (r_node), (a_node));			\
+#define rbtn_rotate_left(a_node, r_node) do {		\
+    (r_node) = rbtn_right_get((a_node));		\
+    rbtn_right_set((a_node),				\
+      rbtn_left_get((r_node)));			\
+    rbtn_left_set((r_node), (a_node));			\
 } while (0)
 
-#define rbtn_rotate_right(dfnode, a_field, a_node, r_node) do {		\
-    (r_node) = rbtn_left_get(dfnode, a_field, (a_node));		\
-    rbtn_left_set(dfnode, a_field, (a_node),				\
-      rbtn_right_get(dfnode, a_field, (r_node)));			\
-    rbtn_right_set(dfnode, a_field, (r_node), (a_node));		\
+#define rbtn_rotate_right(a_node, r_node) do {		\
+    (r_node) = rbtn_left_get((a_node));		\
+    rbtn_left_set((a_node),				\
+      rbtn_right_get((r_node)));			\
+    rbtn_right_set((r_node), (a_node));		\
 } while (0)
 
 
@@ -48,21 +48,20 @@ a_prefix##empty(dftree *rbtree) {					\
 a_attr dfnode *								\
 a_prefix##first(dftree *rbtree) {					\
     dfnode *ret;							\
-    rbtn_first(dfnode, a_field, rbtree, rbtree->rbt_root, ret);		\
+    rbtn_first(rbtree, rbtree->rbt_root, ret);		\
     return ret;								\
 }									\
 a_attr dfnode *								\
 a_prefix##last(dftree *rbtree) {					\
     dfnode *ret;							\
-    rbtn_last(dfnode, a_field, rbtree, rbtree->rbt_root, ret);		\
+    rbtn_last(rbtree, rbtree->rbt_root, ret);		\
     return ret;								\
 }									\
 a_attr dfnode *								\
 a_prefix##next(dftree *rbtree, dfnode *node) {			\
     dfnode *ret;							\
-    if (rbtn_right_get(dfnode, a_field, node) != NULL) {		\
-	rbtn_first(dfnode, a_field, rbtree, rbtn_right_get(dfnode,	\
-	  a_field, node), ret);						\
+    if (rbtn_right_get(node) != NULL) {		\
+	rbtn_first(rbtree, rbtn_right_get(node), ret);						\
     } else {								\
 	dfnode *tnode = rbtree->rbt_root;				\
 	assert(tnode != NULL);						\
@@ -71,9 +70,9 @@ a_prefix##next(dftree *rbtree, dfnode *node) {			\
 	    int cmp = (a_cmp)(node, tnode);				\
 	    if (cmp < 0) {						\
 		ret = tnode;						\
-		tnode = rbtn_left_get(dfnode, a_field, tnode);		\
+		tnode = rbtn_left_get(tnode);		\
 	    } else if (cmp > 0) {					\
-		tnode = rbtn_right_get(dfnode, a_field, tnode);		\
+		tnode = rbtn_right_get(tnode);		\
 	    } else {							\
 		break;							\
 	    }								\
@@ -85,9 +84,8 @@ a_prefix##next(dftree *rbtree, dfnode *node) {			\
 a_attr dfnode *								\
 a_prefix##prev(dftree *rbtree, dfnode *node) {			\
     dfnode *ret;							\
-    if (rbtn_left_get(dfnode, a_field, node) != NULL) {			\
-	rbtn_last(dfnode, a_field, rbtree, rbtn_left_get(dfnode,	\
-	  a_field, node), ret);						\
+    if (rbtn_left_get(node) != NULL) {			\
+	rbtn_last(rbtree, rbtn_left_get(node), ret);						\
     } else {								\
 	dfnode *tnode = rbtree->rbt_root;				\
 	assert(tnode != NULL);						\
@@ -95,10 +93,10 @@ a_prefix##prev(dftree *rbtree, dfnode *node) {			\
 	while (true) {							\
 	    int cmp = (a_cmp)(node, tnode);				\
 	    if (cmp < 0) {						\
-		tnode = rbtn_left_get(dfnode, a_field, tnode);		\
+		tnode = rbtn_left_get(tnode);		\
 	    } else if (cmp > 0) {					\
 		ret = tnode;						\
-		tnode = rbtn_right_get(dfnode, a_field, tnode);		\
+		tnode = rbtn_right_get(tnode);		\
 	    } else {							\
 		break;							\
 	    }								\
@@ -115,9 +113,9 @@ a_prefix##search(dftree *rbtree, const dfnode *key) {		\
     while (ret != NULL							\
       && (cmp = (a_cmp)(key, ret)) != 0) {				\
 	if (cmp < 0) {							\
-	    ret = rbtn_left_get(dfnode, a_field, ret);			\
+	    ret = rbtn_left_get(ret);			\
 	} else {							\
-	    ret = rbtn_right_get(dfnode, a_field, ret);			\
+	    ret = rbtn_right_get(ret);			\
 	}								\
     }									\
     return ret;								\
@@ -131,9 +129,9 @@ a_prefix##nsearch(dftree *rbtree, const dfnode *key) {		\
 	int cmp = (a_cmp)(key, tnode);					\
 	if (cmp < 0) {							\
 	    ret = tnode;						\
-	    tnode = rbtn_left_get(dfnode, a_field, tnode);		\
+	    tnode = rbtn_left_get(tnode);		\
 	} else if (cmp > 0) {						\
-	    tnode = rbtn_right_get(dfnode, a_field, tnode);		\
+	    tnode = rbtn_right_get(tnode);		\
 	} else {							\
 	    ret = tnode;						\
 	    break;							\
@@ -149,10 +147,10 @@ a_prefix##psearch(dftree *rbtree, const dfnode *key) {		\
     while (tnode != NULL) {						\
 	int cmp = (a_cmp)(key, tnode);					\
 	if (cmp < 0) {							\
-	    tnode = rbtn_left_get(dfnode, a_field, tnode);		\
+	    tnode = rbtn_left_get(tnode);		\
 	} else if (cmp > 0) {						\
 	    ret = tnode;						\
-	    tnode = rbtn_right_get(dfnode, a_field, tnode);		\
+	    tnode = rbtn_right_get(tnode);		\
 	} else {							\
 	    ret = tnode;						\
 	    break;							\
@@ -166,17 +164,17 @@ a_prefix##insert(dftree *rbtree, dfnode *node) {			\
 	dfnode *node;							\
 	int cmp;							\
     } path[sizeof(void *) << 4], *pathp;				\
-    rbt_node_new(dfnode, a_field, rbtree, node);			\
+    rbt_node_new(rbtree, node);			\
     /* Wind. */								\
     path->node = rbtree->rbt_root;					\
     for (pathp = path; pathp->node != NULL; pathp++) {			\
 	int cmp = pathp->cmp = a_cmp(node, pathp->node);		\
 	assert(cmp != 0);						\
 	if (cmp < 0) {							\
-	    pathp[1].node = rbtn_left_get(dfnode, a_field,		\
+	    pathp[1].node = rbtn_left_get(		\
 	      pathp->node);						\
 	} else {							\
-	    pathp[1].node = rbtn_right_get(dfnode, a_field,		\
+	    pathp[1].node = rbtn_right_get(		\
 	      pathp->node);						\
 	}								\
     }									\
@@ -186,15 +184,15 @@ a_prefix##insert(dftree *rbtree, dfnode *node) {			\
 	dfnode *cnode = pathp->node;					\
 	if (pathp->cmp < 0) {						\
 	    dfnode *left = pathp[1].node;				\
-	    rbtn_left_set(dfnode, a_field, cnode, left);		\
-	    if (rbtn_red_get(dfnode, a_field, left)) {			\
-		dfnode *leftleft = rbtn_left_get(dfnode, a_field, left);\
-		if (leftleft != NULL && rbtn_red_get(dfnode, a_field,	\
+	    rbtn_left_set(cnode, left);		\
+	    if (rbtn_red_get(left)) {			\
+		dfnode *leftleft = rbtn_left_get(left);\
+		if (leftleft != NULL && rbtn_red_get(	\
 		  leftleft)) {						\
 		    /* Fix up 4-node. */				\
 		    dfnode *tnode;					\
-		    rbtn_black_set(dfnode, a_field, leftleft);		\
-		    rbtn_rotate_right(dfnode, a_field, cnode, tnode);	\
+		    rbtn_black_set(leftleft);		\
+		    rbtn_rotate_right(cnode, tnode);	\
 		    cnode = tnode;					\
 		}							\
 	    } else {							\
@@ -202,22 +200,22 @@ a_prefix##insert(dftree *rbtree, dfnode *node) {			\
 	    }								\
 	} else {							\
 	    dfnode *right = pathp[1].node;				\
-	    rbtn_right_set(dfnode, a_field, cnode, right);		\
-	    if (rbtn_red_get(dfnode, a_field, right)) {			\
-		dfnode *left = rbtn_left_get(dfnode, a_field, cnode);	\
-		if (left != NULL && rbtn_red_get(dfnode, a_field,	\
+	    rbtn_right_set(cnode, right);		\
+	    if (rbtn_red_get(right)) {			\
+		dfnode *left = rbtn_left_get(cnode);	\
+		if (left != NULL && rbtn_red_get(	\
 		  left)) {						\
 		    /* Split 4-node. */					\
-		    rbtn_black_set(dfnode, a_field, left);		\
-		    rbtn_black_set(dfnode, a_field, right);		\
-		    rbtn_red_set(dfnode, a_field, cnode);		\
+		    rbtn_black_set(left);		\
+		    rbtn_black_set(right);		\
+		    rbtn_red_set(cnode);		\
 		} else {						\
 		    /* Lean left. */					\
 		    dfnode *tnode;					\
-		    bool tred = rbtn_red_get(dfnode, a_field, cnode);	\
-		    rbtn_rotate_left(dfnode, a_field, cnode, tnode);	\
-		    rbtn_color_set(dfnode, a_field, tnode, tred);	\
-		    rbtn_red_set(dfnode, a_field, cnode);		\
+		    bool tred = rbtn_red_get(cnode);	\
+		    rbtn_rotate_left(cnode, tnode);	\
+		    rbtn_color_set(tnode, tred);	\
+		    rbtn_red_set(cnode);		\
 		    cnode = tnode;					\
 		}							\
 	    } else {							\
@@ -228,7 +226,7 @@ a_prefix##insert(dftree *rbtree, dfnode *node) {			\
     }									\
     /* Set root, and make it black. */					\
     rbtree->rbt_root = path->node;					\
-    rbtn_black_set(dfnode, a_field, rbtree->rbt_root);			\
+    rbtn_black_set(rbtree->rbt_root);			\
 }									\
 a_attr void								\
 a_prefix##remove(dftree *rbtree, dfnode *node) {			\
@@ -242,10 +240,10 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
     for (pathp = path; pathp->node != NULL; pathp++) {			\
 	int cmp = pathp->cmp = a_cmp(node, pathp->node);		\
 	if (cmp < 0) {							\
-	    pathp[1].node = rbtn_left_get(dfnode, a_field,		\
+	    pathp[1].node = rbtn_left_get(		\
 	      pathp->node);						\
 	} else {							\
-	    pathp[1].node = rbtn_right_get(dfnode, a_field,		\
+	    pathp[1].node = rbtn_right_get(		\
 	      pathp->node);						\
 	    if (cmp == 0) {						\
 	        /* Find node's successor, in preparation for swap. */	\
@@ -253,7 +251,7 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		nodep = pathp;						\
 		for (pathp++; pathp->node != NULL; pathp++) {		\
 		    pathp->cmp = -1;					\
-		    pathp[1].node = rbtn_left_get(dfnode, a_field,	\
+		    pathp[1].node = rbtn_left_get(	\
 		      pathp->node);					\
 		}							\
 		break;							\
@@ -264,18 +262,18 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
     pathp--;								\
     if (pathp->node != node) {						\
 	/* Swap node with its successor. */				\
-	bool tred = rbtn_red_get(dfnode, a_field, pathp->node);		\
-	rbtn_color_set(dfnode, a_field, pathp->node,			\
-	  rbtn_red_get(dfnode, a_field, node));				\
-	rbtn_left_set(dfnode, a_field, pathp->node,			\
-	  rbtn_left_get(dfnode, a_field, node));			\
+	bool tred = rbtn_red_get(pathp->node);		\
+	rbtn_color_set(pathp->node,			\
+	  rbtn_red_get(node));				\
+	rbtn_left_set(pathp->node,			\
+	  rbtn_left_get(node));			\
 	/* If node's successor is its right child, the following code */\
 	/* will do the wrong thing for the right child pointer.       */\
 	/* However, it doesn't matter, because the pointer will be    */\
 	/* properly set when the successor is pruned.                 */\
-	rbtn_right_set(dfnode, a_field, pathp->node,			\
-	  rbtn_right_get(dfnode, a_field, node));			\
-	rbtn_color_set(dfnode, a_field, node, tred);			\
+	rbtn_right_set(pathp->node,			\
+	  rbtn_right_get(node));			\
+	rbtn_color_set(node, tred);			\
 	/* The pruned leaf node's child pointers are never accessed   */\
 	/* again, so don't bother setting them to nil.                */\
 	nodep->node = pathp->node;					\
@@ -284,29 +282,29 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 	    rbtree->rbt_root = nodep->node;				\
 	} else {							\
 	    if (nodep[-1].cmp < 0) {					\
-		rbtn_left_set(dfnode, a_field, nodep[-1].node,		\
+		rbtn_left_set(nodep[-1].node,		\
 		  nodep->node);						\
 	    } else {							\
-		rbtn_right_set(dfnode, a_field, nodep[-1].node,		\
+		rbtn_right_set(nodep[-1].node,		\
 		  nodep->node);						\
 	    }								\
 	}								\
     } else {								\
-	dfnode *left = rbtn_left_get(dfnode, a_field, node);		\
+	dfnode *left = rbtn_left_get(node);		\
 	if (left != NULL) {						\
 	    /* node has no successor, but it has a left child.        */\
 	    /* Splice node out, without losing the left child.        */\
-	    assert(!rbtn_red_get(dfnode, a_field, node));		\
-	    assert(rbtn_red_get(dfnode, a_field, left));		\
-	    rbtn_black_set(dfnode, a_field, left);			\
+	    assert(!rbtn_red_get(node));		\
+	    assert(rbtn_red_get(left));		\
+	    rbtn_black_set(left);			\
 	    if (pathp == path) {					\
 		rbtree->rbt_root = left;				\
 	    } else {							\
 		if (pathp[-1].cmp < 0) {				\
-		    rbtn_left_set(dfnode, a_field, pathp[-1].node,	\
+		    rbtn_left_set(pathp[-1].node,	\
 		      left);						\
 		} else {						\
-		    rbtn_right_set(dfnode, a_field, pathp[-1].node,	\
+		    rbtn_right_set(pathp[-1].node,	\
 		      left);						\
 		}							\
 	    }								\
@@ -317,10 +315,10 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 	    return;							\
 	}								\
     }									\
-    if (rbtn_red_get(dfnode, a_field, pathp->node)) {			\
+    if (rbtn_red_get(pathp->node)) {			\
 	/* Prune red node, which requires no fixup. */			\
 	assert(pathp[-1].cmp < 0);					\
-	rbtn_left_set(dfnode, a_field, pathp[-1].node, NULL);		\
+	rbtn_left_set(pathp[-1].node, NULL);		\
 	return;								\
     }									\
     /* The node to be pruned is black, so unwind until balance is     */\
@@ -329,15 +327,15 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
     for (pathp--; (uintptr_t)pathp >= (uintptr_t)path; pathp--) {	\
 	assert(pathp->cmp != 0);					\
 	if (pathp->cmp < 0) {						\
-	    rbtn_left_set(dfnode, a_field, pathp->node,			\
+	    rbtn_left_set(pathp->node,			\
 	      pathp[1].node);						\
-	    if (rbtn_red_get(dfnode, a_field, pathp->node)) {		\
-		dfnode *right = rbtn_right_get(dfnode, a_field,		\
+	    if (rbtn_red_get(pathp->node)) {		\
+		dfnode *right = rbtn_right_get(		\
 		  pathp->node);						\
-		dfnode *rightleft = rbtn_left_get(dfnode, a_field,	\
+		dfnode *rightleft = rbtn_left_get(	\
 		  right);						\
 		dfnode *tnode;						\
-		if (rightleft != NULL && rbtn_red_get(dfnode, a_field,	\
+		if (rightleft != NULL && rbtn_red_get(	\
 		  rightleft)) {						\
 		    /* In the following diagrams, ||, //, and \\      */\
 		    /* indicate the path to the removed node.         */\
@@ -349,10 +347,10 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		    /*           /                                    */\
 		    /*          (r)                                   */\
 		    /*                                                */\
-		    rbtn_black_set(dfnode, a_field, pathp->node);	\
-		    rbtn_rotate_right(dfnode, a_field, right, tnode);	\
-		    rbtn_right_set(dfnode, a_field, pathp->node, tnode);\
-		    rbtn_rotate_left(dfnode, a_field, pathp->node,	\
+		    rbtn_black_set(pathp->node);	\
+		    rbtn_rotate_right(right, tnode);	\
+		    rbtn_right_set(pathp->node, tnode);\
+		    rbtn_rotate_left(pathp->node,	\
 		      tnode);						\
 		} else {						\
 		    /*      ||                                        */\
@@ -362,26 +360,26 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		    /*           /                                    */\
 		    /*          (b)                                   */\
 		    /*                                                */\
-		    rbtn_rotate_left(dfnode, a_field, pathp->node,	\
+		    rbtn_rotate_left(pathp->node,	\
 		      tnode);						\
 		}							\
 		/* Balance restored, but rotation modified subtree    */\
 		/* root.                                              */\
 		assert((uintptr_t)pathp > (uintptr_t)path);		\
 		if (pathp[-1].cmp < 0) {				\
-		    rbtn_left_set(dfnode, a_field, pathp[-1].node,	\
+		    rbtn_left_set(pathp[-1].node,	\
 		      tnode);						\
 		} else {						\
-		    rbtn_right_set(dfnode, a_field, pathp[-1].node,	\
+		    rbtn_right_set(pathp[-1].node,	\
 		      tnode);						\
 		}							\
 		return;							\
 	    } else {							\
-		dfnode *right = rbtn_right_get(dfnode, a_field,		\
+		dfnode *right = rbtn_right_get(		\
 		  pathp->node);						\
-		dfnode *rightleft = rbtn_left_get(dfnode, a_field,	\
+		dfnode *rightleft = rbtn_left_get(	\
 		  right);						\
-		if (rightleft != NULL && rbtn_red_get(dfnode, a_field,	\
+		if (rightleft != NULL && rbtn_red_get(	\
 		  rightleft)) {						\
 		    /*      ||                                        */\
 		    /*    pathp(b)                                    */\
@@ -390,10 +388,10 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		    /*           /                                    */\
 		    /*          (r)                                   */\
 		    dfnode *tnode;					\
-		    rbtn_black_set(dfnode, a_field, rightleft);		\
-		    rbtn_rotate_right(dfnode, a_field, right, tnode);	\
-		    rbtn_right_set(dfnode, a_field, pathp->node, tnode);\
-		    rbtn_rotate_left(dfnode, a_field, pathp->node,	\
+		    rbtn_black_set(rightleft);		\
+		    rbtn_rotate_right(right, tnode);	\
+		    rbtn_right_set(pathp->node, tnode);\
+		    rbtn_rotate_left(pathp->node,	\
 		      tnode);						\
 		    /* Balance restored, but rotation modified        */\
 		    /* subtree root, which may actually be the tree   */\
@@ -403,10 +401,10 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 			rbtree->rbt_root = tnode;			\
 		    } else {						\
 			if (pathp[-1].cmp < 0) {			\
-			    rbtn_left_set(dfnode, a_field,		\
+			    rbtn_left_set(		\
 			      pathp[-1].node, tnode);			\
 			} else {					\
-			    rbtn_right_set(dfnode, a_field,		\
+			    rbtn_right_set(		\
 			      pathp[-1].node, tnode);			\
 			}						\
 		    }							\
@@ -419,25 +417,24 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		    /*           /                                    */\
 		    /*          (b)                                   */\
 		    dfnode *tnode;					\
-		    rbtn_red_set(dfnode, a_field, pathp->node);		\
-		    rbtn_rotate_left(dfnode, a_field, pathp->node,	\
+		    rbtn_red_set(pathp->node);		\
+		    rbtn_rotate_left(pathp->node,	\
 		      tnode);						\
 		    pathp->node = tnode;				\
 		}							\
 	    }								\
 	} else {							\
 	    dfnode *left;						\
-	    rbtn_right_set(dfnode, a_field, pathp->node,		\
+	    rbtn_right_set(pathp->node,		\
 	      pathp[1].node);						\
-	    left = rbtn_left_get(dfnode, a_field, pathp->node);		\
-	    if (rbtn_red_get(dfnode, a_field, left)) {			\
+	    left = rbtn_left_get(pathp->node);		\
+	    if (rbtn_red_get(left)) {			\
 		dfnode *tnode;						\
-		dfnode *leftright = rbtn_right_get(dfnode, a_field,	\
+		dfnode *leftright = rbtn_right_get(	\
 		  left);						\
-		dfnode *leftrightleft = rbtn_left_get(dfnode, a_field,	\
+		dfnode *leftrightleft = rbtn_left_get(	\
 		  leftright);						\
-		if (leftrightleft != NULL && rbtn_red_get(dfnode,	\
-		  a_field, leftrightleft)) {				\
+		if (leftrightleft != NULL && rbtn_red_get(leftrightleft)) {				\
 		    /*      ||                                        */\
 		    /*    pathp(b)                                    */\
 		    /*   /        \\                                  */\
@@ -447,13 +444,13 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		    /*   /                                            */\
 		    /* (r)                                            */\
 		    dfnode *unode;					\
-		    rbtn_black_set(dfnode, a_field, leftrightleft);	\
-		    rbtn_rotate_right(dfnode, a_field, pathp->node,	\
+		    rbtn_black_set(leftrightleft);	\
+		    rbtn_rotate_right(pathp->node,	\
 		      unode);						\
-		    rbtn_rotate_right(dfnode, a_field, pathp->node,	\
+		    rbtn_rotate_right(pathp->node,	\
 		      tnode);						\
-		    rbtn_right_set(dfnode, a_field, unode, tnode);	\
-		    rbtn_rotate_left(dfnode, a_field, unode, tnode);	\
+		    rbtn_right_set(unode, tnode);	\
+		    rbtn_rotate_left(unode, tnode);	\
 		} else {						\
 		    /*      ||                                        */\
 		    /*    pathp(b)                                    */\
@@ -464,10 +461,10 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		    /*   /                                            */\
 		    /* (b)                                            */\
 		    assert(leftright != NULL);				\
-		    rbtn_red_set(dfnode, a_field, leftright);		\
-		    rbtn_rotate_right(dfnode, a_field, pathp->node,	\
+		    rbtn_red_set(leftright);		\
+		    rbtn_rotate_right(pathp->node,	\
 		      tnode);						\
-		    rbtn_black_set(dfnode, a_field, tnode);		\
+		    rbtn_black_set(tnode);		\
 		}							\
 		/* Balance restored, but rotation modified subtree    */\
 		/* root, which may actually be the tree root.         */\
@@ -476,17 +473,17 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		    rbtree->rbt_root = tnode;				\
 		} else {						\
 		    if (pathp[-1].cmp < 0) {				\
-			rbtn_left_set(dfnode, a_field, pathp[-1].node,	\
+			rbtn_left_set(pathp[-1].node,	\
 			  tnode);					\
 		    } else {						\
-			rbtn_right_set(dfnode, a_field, pathp[-1].node,	\
+			rbtn_right_set(pathp[-1].node,	\
 			  tnode);					\
 		    }							\
 		}							\
 		return;							\
-	    } else if (rbtn_red_get(dfnode, a_field, pathp->node)) {	\
-		dfnode *leftleft = rbtn_left_get(dfnode, a_field, left);\
-		if (leftleft != NULL && rbtn_red_get(dfnode, a_field,	\
+	    } else if (rbtn_red_get(pathp->node)) {	\
+		dfnode *leftleft = rbtn_left_get(left);\
+		if (leftleft != NULL && rbtn_red_get(	\
 		  leftleft)) {						\
 		    /*        ||                                      */\
 		    /*      pathp(r)                                  */\
@@ -495,19 +492,19 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		    /*   /                                            */\
 		    /* (r)                                            */\
 		    dfnode *tnode;					\
-		    rbtn_black_set(dfnode, a_field, pathp->node);	\
-		    rbtn_red_set(dfnode, a_field, left);		\
-		    rbtn_black_set(dfnode, a_field, leftleft);		\
-		    rbtn_rotate_right(dfnode, a_field, pathp->node,	\
+		    rbtn_black_set(pathp->node);	\
+		    rbtn_red_set(left);		\
+		    rbtn_black_set(leftleft);		\
+		    rbtn_rotate_right(pathp->node,	\
 		      tnode);						\
 		    /* Balance restored, but rotation modified        */\
 		    /* subtree root.                                  */\
 		    assert((uintptr_t)pathp > (uintptr_t)path);		\
 		    if (pathp[-1].cmp < 0) {				\
-			rbtn_left_set(dfnode, a_field, pathp[-1].node,	\
+			rbtn_left_set(pathp[-1].node,	\
 			  tnode);					\
 		    } else {						\
-			rbtn_right_set(dfnode, a_field, pathp[-1].node,	\
+			rbtn_right_set(pathp[-1].node,	\
 			  tnode);					\
 		    }							\
 		    return;						\
@@ -518,14 +515,14 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		    /*   (b)        (b)                               */\
 		    /*   /                                            */\
 		    /* (b)                                            */\
-		    rbtn_red_set(dfnode, a_field, left);		\
-		    rbtn_black_set(dfnode, a_field, pathp->node);	\
+		    rbtn_red_set(left);		\
+		    rbtn_black_set(pathp->node);	\
 		    /* Balance restored. */				\
 		    return;						\
 		}							\
 	    } else {							\
-		dfnode *leftleft = rbtn_left_get(dfnode, a_field, left);\
-		if (leftleft != NULL && rbtn_red_get(dfnode, a_field,	\
+		dfnode *leftleft = rbtn_left_get(left);\
+		if (leftleft != NULL && rbtn_red_get(	\
 		  leftleft)) {						\
 		    /*               ||                               */\
 		    /*             pathp(b)                           */\
@@ -534,8 +531,8 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		    /*          /                                     */\
 		    /*        (r)                                     */\
 		    dfnode *tnode;					\
-		    rbtn_black_set(dfnode, a_field, leftleft);		\
-		    rbtn_rotate_right(dfnode, a_field, pathp->node,	\
+		    rbtn_black_set(leftleft);		\
+		    rbtn_rotate_right(pathp->node,	\
 		      tnode);						\
 		    /* Balance restored, but rotation modified        */\
 		    /* subtree root, which may actually be the tree   */\
@@ -545,10 +542,10 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 			rbtree->rbt_root = tnode;			\
 		    } else {						\
 			if (pathp[-1].cmp < 0) {			\
-			    rbtn_left_set(dfnode, a_field,		\
+			    rbtn_left_set(		\
 			      pathp[-1].node, tnode);			\
 			} else {					\
-			    rbtn_right_set(dfnode, a_field,		\
+			    rbtn_right_set(		\
 			      pathp[-1].node, tnode);			\
 			}						\
 		    }							\
@@ -560,14 +557,14 @@ a_prefix##remove(dftree *rbtree, dfnode *node) {			\
 		    /*          (b)        (b)                        */\
 		    /*          /                                     */\
 		    /*        (b)                                     */\
-		    rbtn_red_set(dfnode, a_field, left);		\
+		    rbtn_red_set(left);		\
 		}							\
 	    }								\
 	}								\
     }									\
     /* Set root. */							\
     rbtree->rbt_root = path->node;					\
-    assert(!rbtn_red_get(dfnode, a_field, rbtree->rbt_root));		\
+    assert(!rbtn_red_get(rbtree->rbt_root));		\
 }									\
 a_attr dfnode *								\
 a_prefix##iter_recurse(dftree *rbtree, dfnode *node,		\
@@ -576,13 +573,11 @@ a_prefix##iter_recurse(dftree *rbtree, dfnode *node,		\
 	return NULL;							\
     } else {								\
 	dfnode *ret;							\
-	if ((ret = a_prefix##iter_recurse(rbtree, rbtn_left_get(dfnode,	\
-	  a_field, node), cb, arg)) != NULL || (ret = cb(rbtree, node,	\
+	if ((ret = a_prefix##iter_recurse(rbtree, rbtn_left_get(node), cb, arg)) != NULL || (ret = cb(rbtree, node,	\
 	  arg)) != NULL) {						\
 	    return ret;							\
 	}								\
-	return a_prefix##iter_recurse(rbtree, rbtn_right_get(dfnode,	\
-	  a_field, node), cb, arg);					\
+	return a_prefix##iter_recurse(rbtree, rbtn_right_get(node), cb, arg);					\
     }									\
 }									\
 a_attr dfnode *								\
@@ -592,22 +587,20 @@ a_prefix##iter_start(dftree *rbtree, dfnode *start, dfnode *node,	\
     if (cmp < 0) {							\
 	dfnode *ret;							\
 	if ((ret = a_prefix##iter_start(rbtree, start,			\
-	  rbtn_left_get(dfnode, a_field, node), cb, arg)) != NULL ||	\
+	  rbtn_left_get(node), cb, arg)) != NULL ||	\
 	  (ret = cb(rbtree, node, arg)) != NULL) {			\
 	    return ret;							\
 	}								\
-	return a_prefix##iter_recurse(rbtree, rbtn_right_get(dfnode,	\
-	  a_field, node), cb, arg);					\
+	return a_prefix##iter_recurse(rbtree, rbtn_right_get(node), cb, arg);					\
     } else if (cmp > 0) {						\
 	return a_prefix##iter_start(rbtree, start,			\
-	  rbtn_right_get(dfnode, a_field, node), cb, arg);		\
+	  rbtn_right_get(node), cb, arg);		\
     } else {								\
 	dfnode *ret;							\
 	if ((ret = cb(rbtree, node, arg)) != NULL) {			\
 	    return ret;							\
 	}								\
-	return a_prefix##iter_recurse(rbtree, rbtn_right_get(dfnode,	\
-	  a_field, node), cb, arg);					\
+	return a_prefix##iter_recurse(rbtree, rbtn_right_get(node), cb, arg);					\
     }									\
 }									\
 a_attr dfnode *								\
@@ -630,12 +623,12 @@ a_prefix##reverse_iter_recurse(dftree *rbtree, dfnode *node,	\
     } else {								\
 	dfnode *ret;							\
 	if ((ret = a_prefix##reverse_iter_recurse(rbtree,		\
-	  rbtn_right_get(dfnode, a_field, node), cb, arg)) != NULL ||	\
+	  rbtn_right_get(node), cb, arg)) != NULL ||	\
 	  (ret = cb(rbtree, node, arg)) != NULL) {			\
 	    return ret;							\
 	}								\
 	return a_prefix##reverse_iter_recurse(rbtree,			\
-	  rbtn_left_get(dfnode, a_field, node), cb, arg);		\
+	  rbtn_left_get(node), cb, arg);		\
     }									\
 }									\
 a_attr dfnode *								\
@@ -646,22 +639,22 @@ a_prefix##reverse_iter_start(dftree *rbtree, dfnode *start,		\
     if (cmp > 0) {							\
 	dfnode *ret;							\
 	if ((ret = a_prefix##reverse_iter_start(rbtree, start,		\
-	  rbtn_right_get(dfnode, a_field, node), cb, arg)) != NULL ||	\
+	  rbtn_right_get(node), cb, arg)) != NULL ||	\
 	  (ret = cb(rbtree, node, arg)) != NULL) {			\
 	    return ret;							\
 	}								\
 	return a_prefix##reverse_iter_recurse(rbtree,			\
-	  rbtn_left_get(dfnode, a_field, node), cb, arg);		\
+	  rbtn_left_get(node), cb, arg);		\
     } else if (cmp < 0) {						\
 	return a_prefix##reverse_iter_start(rbtree, start,		\
-	  rbtn_left_get(dfnode, a_field, node), cb, arg);		\
+	  rbtn_left_get(node), cb, arg);		\
     } else {								\
 	dfnode *ret;							\
 	if ((ret = cb(rbtree, node, arg)) != NULL) {			\
 	    return ret;							\
 	}								\
 	return a_prefix##reverse_iter_recurse(rbtree,			\
-	  rbtn_left_get(dfnode, a_field, node), cb, arg);		\
+	  rbtn_left_get(node), cb, arg);		\
     }									\
 }									\
 a_attr dfnode *								\
@@ -683,12 +676,12 @@ a_prefix##destroy_recurse(dftree *rbtree, dfnode *node, void (*cb)(	\
     if (node == NULL) {							\
 	return;								\
     }									\
-    a_prefix##destroy_recurse(rbtree, rbtn_left_get(dfnode, a_field,	\
+    a_prefix##destroy_recurse(rbtree, rbtn_left_get(	\
       node), cb, arg);							\
-    rbtn_left_set(dfnode, a_field, (node), NULL);			\
-    a_prefix##destroy_recurse(rbtree, rbtn_right_get(dfnode, a_field,	\
+    rbtn_left_set((node), NULL);			\
+    a_prefix##destroy_recurse(rbtree, rbtn_right_get(	\
       node), cb, arg);							\
-    rbtn_right_set(dfnode, a_field, (node), NULL);			\
+    rbtn_right_set((node), NULL);			\
     if (cb) {								\
 	cb(node, arg);							\
     }									\
