@@ -59,6 +59,12 @@ void* __fastcall trav_cb(void* ctx, dfnode* node)
 	return NULL;
 }
 
+template <class T>
+void* dftree_iter(dfnode* node, void* ctx, T cb) {
+	return dftree_iter_recurse_(node, ctx, (dftree_iter_t)cb); }
+
+
+
 
 int main()
 {

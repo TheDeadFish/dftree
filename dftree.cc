@@ -35,7 +35,7 @@
 } while (0)
 
 
-bool dftree_insert(dftree *rbtree, 
+dftree_insret_t dftree_insert(dftree *rbtree, 
 	void *knode, void* ctx, compar_t key_cmp,
 	dfnode* (__fastcall *node_create)(void* ctx, void *key))
 {
@@ -49,7 +49,7 @@ bool dftree_insert(dftree *rbtree,
 	path->node = rbtree->root;
 	for (pathp = path; pathp->node != NULL; pathp++) {
 		int cmp = pathp->cmp = key_cmp(knode, pathp->node);
-		if(cmp == 0) return false;
+		if(cmp == 0) return {pathp->node, false};
 		if (cmp < 0) {
 			pathp[1].node = pathp->node->left();
 		} else {
@@ -58,10 +58,9 @@ bool dftree_insert(dftree *rbtree,
 	}
 	
 	// create the node
-	if(node_create) {
-		pathp->node = node_create(ctx, knode);
-	} else { pathp->node = (dfnode*)knode; }
-	pathp->node->init();
+	dfnode* inode = (dfnode*)knode;
+	if(node_create) inode = node_create(ctx, knode);
+	pathp->node = inode; inode->init();
 
 	for (pathp--; (uintptr_t)pathp >= (uintptr_t)path; pathp--) {
 		dfnode *cnode = pathp->node;
@@ -78,7 +77,7 @@ bool dftree_insert(dftree *rbtree,
 					cnode = tnode;
 				}
 			} else {
-				return true;
+				return {inode, true};
 			}
 		} else {
 			dfnode *right = pathp[1].node;
@@ -100,7 +99,7 @@ bool dftree_insert(dftree *rbtree,
 					cnode = tnode;
 				}
 			} else {
-				return true;
+				return {inode, true};
 			}
 		}
 		pathp->node = cnode;
@@ -108,7 +107,7 @@ bool dftree_insert(dftree *rbtree,
 
 	rbtree->root = path->node;
 	rbtree->root->black_set();
-	return true;
+	return {inode, true};
 };
 
 

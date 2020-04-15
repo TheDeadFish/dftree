@@ -24,15 +24,21 @@ struct dfnode {
 		return container_of(this, x); }
 };
 
+// function and types
+struct dftree_insret_t { dfnode* node; bool inserted; };
+typedef dfnode* (__fastcall *dfnode_create_t)(void* ctx, void *key);
+typedef void* (__fastcall *dftree_iter_t)(void*, dfnode*);
+
+
+
 struct dftree { dfnode *root;
 	operator dfnode*() { return root; }
 };
 
 // tree modifcation
 __attribute__((stdcall,regparm(3)))
-bool dftree_insert(dftree *rbtree, 
-	void *key, void* ctx, compar_t key_cmp,
-	dfnode* (__fastcall *node_create)(void* ctx, void *key));
+dftree_insret_t dftree_insert(dftree *rbtree, void *key, 
+	void* ctx, compar_t key_cmp, dfnode_create_t node_create);
 
 // tree search 
 __fastcall dfnode* dftree_search(dfnode* node, 
@@ -43,6 +49,6 @@ __fastcall dfnode* dftree_psearch(dfnode* node,
 	const void* key, compar_t key_cmp);
 
 // tree traversal
-typedef void* (__fastcall *dftree_iter_t)(void*, dfnode*);
 __fastcall void* dftree_iter_recurse_(dfnode* node, void* ctx, dftree_iter_t cb);
 __fastcall void* dftree_iter_rrecurse_(dfnode* node, void* ctx, dftree_iter_t cb);
+
