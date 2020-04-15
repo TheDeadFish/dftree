@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
 
-#define RB_COMPACT
-#include "rb.h"
 #include "stuff.h"
 #include "dftree.h"
 
@@ -26,7 +24,7 @@ node_cmp(const dfnode *a, const dfnode *b) {
 }
 
 
-#include "rb-x-x.cc"
+//#include "rb-x-x.cc"
 
 
 node_s nodes[10000];
@@ -38,8 +36,8 @@ void traversi(dfnode* node, int depth)
 	
 		
 	
-	traversi(node->rbn_left, depth+1);
-	traversi(node->right_get(), depth+1);
+	traversi(node->left(), depth+1);
+	traversi(node->right(), depth+1);
 	
 	
 	
@@ -56,8 +54,8 @@ int main()
 
 
 
-	dftree tree;
-	tree_new(&tree);
+	dftree tree = {};
+
 	for(int i = 0; i < 20; i++) {
 		nodes[i].key = i*10;
 		
