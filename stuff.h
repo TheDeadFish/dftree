@@ -13,3 +13,7 @@ template<class P, class M, class S>
 S* sibling_of(M* ptr, const M P::*member, const S P::*sib) {
 	size_t diff = offsetof(sib)-offsetof(member);
 	return (S*)( (char*)ptr + diff);  }
+
+
+typedef int (*compar_t)(const void*,const void*);
+#define COMPAR(x) ((compar_t)(void*)x)

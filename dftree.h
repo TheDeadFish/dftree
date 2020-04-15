@@ -24,22 +24,25 @@ struct dfnode {
 		return container_of(this, x); }
 };
 
-struct dftree { dfnode *rbt_root;	};
+struct dftree { dfnode *root;
+	operator dfnode*() { return root; }
+};
 
-
-typedef int (*compar_t)(const void*,const void*);
-#define COMPAR(x) ((compar_t)(void*)x)
-
+// tree modifcation
 __attribute__((stdcall,regparm(3)))
 bool dftree_insert(dftree *rbtree, 
 	void *key, void* ctx, compar_t key_cmp,
 	dfnode* (__fastcall *node_create)(void* ctx, void *key));
-	
-	
-	
-	
-	
-// 
+
+// tree search 
+__fastcall dfnode* dftree_search(dfnode* node, 
+	const void* key, compar_t key_cmp);
+__fastcall dfnode* dftree_nsearch(dfnode* node, 
+	const void* key, compar_t key_cmp);
+__fastcall dfnode* dftree_psearch(dfnode* node, 
+	const void* key, compar_t key_cmp);
+
+// tree traversal
 typedef void* (__fastcall *dftree_iter_t)(void*, dfnode*);
-__fastcall void* dftree_iter_recurse_(
-	dfnode* node, void* ctx, dftree_iter_t cb);
+__fastcall void* dftree_iter_recurse_(dfnode* node, void* ctx, dftree_iter_t cb);
+__fastcall void* dftree_iter_rrecurse_(dfnode* node, void* ctx, dftree_iter_t cb);

@@ -46,7 +46,7 @@ bool dftree_insert(dftree *rbtree,
 	} path[sizeof(void *) << 4], *pathp;
 	
 	// locate insertion point
-	path->node = rbtree->rbt_root;
+	path->node = rbtree->root;
 	for (pathp = path; pathp->node != NULL; pathp++) {
 		int cmp = pathp->cmp = key_cmp(knode, pathp->node);
 		if(cmp == 0) return false;
@@ -106,8 +106,8 @@ bool dftree_insert(dftree *rbtree,
 		pathp->node = cnode;
 	}
 
-	rbtree->rbt_root = path->node;
-	rbtree->rbt_root->black_set();
+	rbtree->root = path->node;
+	rbtree->root->black_set();
 	return true;
 };
 
@@ -123,4 +123,53 @@ __fastcall void* dftree_iter_recurse_(
 	IFRET(dftree_iter_recurse_(node->left(), ctx, cb));
 	IFRET(cb(ctx, node));
 	return dftree_iter_recurse_(node->right(), ctx, cb);
+}
+
+__fastcall void* dftree_iter_rrecurse_(
+	dfnode* node, void* ctx, dftree_iter_t cb)
+{
+	if(!node) return node;
+	IFRET(dftree_iter_recurse_(node->right(), ctx, cb));
+	IFRET(cb(ctx, node));
+	return dftree_iter_recurse_(node->left(), ctx, cb);
+}
+
+
+	
+dfnode* dftree_search(dfnode* node,
+	const void* key, compar_t key_cmp)
+{
+	while (node != NULL) {
+		int cmp = key_cmp(key, node);
+		if(cmp > 0) node = node->right();
+		else { if(!cmp) break;
+			node = node->left(); }
+	}
+	return node;
+}
+
+dfnode* dftree_nsearch(dfnode* node,
+	const void* key, compar_t key_cmp)
+{
+	dfnode* ret = NULL;
+	while (node != NULL) {
+		int cmp = key_cmp(key, node);
+		if(cmp > 0) node = node->right();
+		else { ret = node; if(!cmp) break;
+			node = node->left(); }
+	}
+	return ret;
+}
+
+dfnode* dftree_psearch(dfnode* node,
+	const void* key, compar_t key_cmp)
+{
+	dfnode* ret = NULL;
+	while (node != NULL) {
+		int cmp = key_cmp(key, node);
+		if(cmp < 0) node = node->left();
+		else { ret = node; if(!cmp) break;
+			node = node->right(); }
+	}
+	return ret;
 }

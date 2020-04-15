@@ -74,9 +74,9 @@ int main()
 		dftree_insert(&tree, &nodes[i].link, 0, COMPAR(node_cmp), 0);
 	}
 	
-	traversi(tree.rbt_root, 0);
+	traversi(tree.root, 0);
 	
-	dftree_iter_recurse_(tree.rbt_root, 0, trav_cb);
+	dftree_iter(tree.root, 0, trav_cb);
 	
 	
 }
