@@ -10,6 +10,8 @@ struct dfnode {
   void color_set(bool x) { rbn_right_red = (rbn_right_red&-2LL) | (intptr_t)x; }
   void red_set() { rbn_right_red |= 1; }
   void black_set() { rbn_right_red &= -2LL; }
+  
+  void init() { rbn_left = 0; rbn_right_red = 1; }
 };
 
 struct dftree { dfnode *rbt_root;	};

@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <assert.h>
 
-//#include "dftree.h"
+
 #include "rb.h"
+#include "dftree.h"
 
 
 /* Internal utility macros. */
@@ -40,30 +41,33 @@
 } while (0)
 
 
-
-
-
-void __thiscall
-dftree_insert (dftree *rbtree, dfnode *node,
-	int (*node_cmp)(const void *, const void*))
+bool dftree_insert(dftree *rbtree, 
+	void *knode, void* ctx, compar_t key_cmp,
+	dfnode* (__fastcall *node_create)(void* ctx, void *key))
 {
+
 	struct {
 		dfnode *node;
 		int cmp;
 	} path[sizeof(void *) << 4], *pathp;
-	rbt_node_new(dfnode, link, rbtree, node);
-
+	
+	// locate insertion point
 	path->node = rbtree->rbt_root;
 	for (pathp = path; pathp->node != NULL; pathp++) {
-		int cmp = pathp->cmp = node_cmp(node, pathp->node);
-		assert(cmp != 0);
+		int cmp = pathp->cmp = key_cmp(knode, pathp->node);
+		if(cmp == 0) return false;
 		if (cmp < 0) {
 			pathp[1].node = rbtn_left_get(dfnode, link, pathp->node);
 		} else {
 			pathp[1].node = rbtn_right_get(dfnode, link, pathp->node);
 		}
 	}
-	pathp->node = node;
+	
+	// create the node
+	if(node_create) {
+		pathp->node = node_create(ctx, knode);
+	} else { pathp->node = (dfnode*)knode; }
+	pathp->node->init();
 
 	for (pathp--; (uintptr_t)pathp >= (uintptr_t)path; pathp--) {
 		dfnode *cnode = pathp->node;
@@ -80,7 +84,7 @@ dftree_insert (dftree *rbtree, dfnode *node,
 					cnode = tnode;
 				}
 			} else {
-				return;
+				return true;
 			}
 		} else {
 			dfnode *right = pathp[1].node;
@@ -102,7 +106,7 @@ dftree_insert (dftree *rbtree, dfnode *node,
 					cnode = tnode;
 				}
 			} else {
-				return;
+				return true;
 			}
 		}
 		pathp->node = cnode;
@@ -110,4 +114,5 @@ dftree_insert (dftree *rbtree, dfnode *node,
 
 	rbtree->rbt_root = path->node;
 	rbtn_black_set(dfnode, link, rbtree->rbt_root);
+	return true;
 };

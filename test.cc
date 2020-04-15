@@ -61,7 +61,7 @@ int main()
 	for(int i = 0; i < 20; i++) {
 		nodes[i].key = i*10;
 		
-		dftree_insert(&tree, &nodes[i].link, COMPAR(node_cmp));
+		dftree_insert(&tree, &nodes[i].link, 0, COMPAR(node_cmp), 0);
 	}
 	
 	traversi(tree.rbt_root, 0);
