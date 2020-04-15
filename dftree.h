@@ -1,4 +1,5 @@
 #pragma once
+#include "stuff.h"
 
 struct dfnode {	
   dfnode *left_ptr;	
@@ -17,6 +18,10 @@ struct dfnode {
 
   void init() { left_ptr = 0; right_red = 1; }
 	void set_right_red(dfnode* p, intptr_t c) { right_red = (intptr_t)p | c; }
+	
+	
+	template <class T> auto* cont(T x) {
+		return container_of(this, x); }
 };
 
 struct dftree { dfnode *rbt_root;	};
@@ -29,3 +34,12 @@ __attribute__((stdcall,regparm(3)))
 bool dftree_insert(dftree *rbtree, 
 	void *key, void* ctx, compar_t key_cmp,
 	dfnode* (__fastcall *node_create)(void* ctx, void *key));
+	
+	
+	
+	
+	
+// 
+typedef void* (__fastcall *dftree_iter_t)(void*, dfnode*);
+__fastcall void* dftree_iter_recurse_(
+	dfnode* node, void* ctx, dftree_iter_t cb);

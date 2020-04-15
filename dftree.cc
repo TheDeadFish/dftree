@@ -110,3 +110,17 @@ bool dftree_insert(dftree *rbtree,
 	rbtree->rbt_root->black_set();
 	return true;
 };
+
+
+
+
+typedef void* (__fastcall *dftree_iter_t)(void*, dfnode*);
+
+__fastcall void* dftree_iter_recurse_(
+	dfnode* node, void* ctx, dftree_iter_t cb)
+{
+	if(!node) return node;
+	IFRET(dftree_iter_recurse_(node->left(), ctx, cb));
+	IFRET(cb(ctx, node));
+	return dftree_iter_recurse_(node->right(), ctx, cb);
+}

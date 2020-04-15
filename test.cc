@@ -48,6 +48,18 @@ void traversi(dfnode* node, int depth)
 }
 
 
+void* __fastcall trav_cb(void* ctx, dfnode* node)
+{
+	auto* n = node->cont(&node_s::link);
+	
+
+
+	printf("%d\n", n->key);
+	
+	return NULL;
+}
+
+
 int main()
 {
 	
@@ -64,7 +76,7 @@ int main()
 	
 	traversi(tree.rbt_root, 0);
 	
-	
+	dftree_iter_recurse_(tree.rbt_root, 0, trav_cb);
 	
 	
 }
