@@ -1,5 +1,4 @@
 #pragma once
-#include "stuff.h"
 
 struct dfnode {	
   dfnode *left_ptr;	

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
+#include "stuff.h"
 #include "dftree.h"
 
 /* Internal utility macros. */
