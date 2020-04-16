@@ -57,19 +57,19 @@ struct node_list
 
 dfnode* node_list::init(dfnode* node, void* key, compar_t key_cmp)
 {
+	pathp = path;
+
 	// locate insertion point
-	path->node = node;
-	for (pathp = path; pathp->node != NULL; pathp++) {
+		
+	for(; pathp->node = node; pathp++) 
+	{
 		int cmp = pathp->cmp = key_cmp(key, pathp->node);
-		if(cmp == 0) return {pathp->node};
-		if (cmp < 0) {
-			pathp[1].node = pathp->node->left();
-		} else {
-			pathp[1].node = pathp->node->right();
-		}
+		if(cmp == 0) break;
+		if (cmp < 0) { node = node->left();
+		} else { node = node->right(); }
 	}
 	
-	return NULL;
+	return node;
 }
 
 dfnode* node_list::insert(dfnode* inode)
