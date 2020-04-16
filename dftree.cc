@@ -57,10 +57,7 @@ struct node_list
 
 dfnode* node_list::init(dfnode* node, void* key, compar_t key_cmp)
 {
-	pathp = path;
-
-	// locate insertion point
-		
+	list_t* pathp = path;
 	for(; pathp->node = node; pathp++) 
 	{
 		int cmp = pathp->cmp = key_cmp(key, pathp->node);
@@ -69,6 +66,7 @@ dfnode* node_list::init(dfnode* node, void* key, compar_t key_cmp)
 		} else { node = node->right(); }
 	}
 	
+	this->pathp = pathp;
 	return node;
 }
 
