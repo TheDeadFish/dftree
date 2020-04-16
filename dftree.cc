@@ -158,7 +158,7 @@ void dftree_insert(dftree *rbtree, dfnode *inode, compar_t key_cmp)
 
 typedef void* (__fastcall *dftree_iter_t)(void*, dfnode*);
 
-__fastcall void* dftree_iter_recurse_(
+void* dftree_iter_recurse_(
 	dfnode* node, void* ctx, dftree_iter_t cb)
 {
 	if(!node) return node;
@@ -167,7 +167,7 @@ __fastcall void* dftree_iter_recurse_(
 	return dftree_iter_recurse_(node->right, ctx, cb);
 }
 
-__fastcall void* dftree_iter_rrecurse_(
+void* dftree_iter_rrecurse_(
 	dfnode* node, void* ctx, dftree_iter_t cb)
 {
 	if(!node) return node;

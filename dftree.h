@@ -1,6 +1,10 @@
 #pragma once
 
 typedef int (*compar_t)(const void*,const void*);
+#define REGCALL(x) __attribute__((stdcall,regparm(x)))
+
+
+
 
 // this will go somewhere else later
 template <class T>
@@ -56,22 +60,20 @@ struct dftree { dfnode *root;
 };
 
 // tree modifcation
-__attribute__((stdcall,regparm(3)))
-dftree_insret_t dftree_insert(dftree *rbtree, void *key, 
+REGCALL(3) dftree_insret_t dftree_insert(dftree *rbtree, void *key, 
 	void* ctx, compar_t key_cmp, dfnode_create_t node_create);
 	
-__attribute__((stdcall,regparm(3))) 
-void dftree_insert(dftree *rbtree, dfnode *node, compar_t key_cmp);
+REGCALL(3) void dftree_insert(dftree *rbtree, 
+	dfnode *node, compar_t key_cmp);
 
 // tree search 
-__fastcall dfnode* dftree_search(dfnode* node, 
+REGCALL(3) dfnode* dftree_search(dfnode* node, 
 	const void* key, compar_t key_cmp);
-__fastcall dfnode* dftree_nsearch(dfnode* node, 
+REGCALL(3) dfnode* dftree_nsearch(dfnode* node, 
 	const void* key, compar_t key_cmp);
-__fastcall dfnode* dftree_psearch(dfnode* node, 
+REGCALL(3) dfnode* dftree_psearch(dfnode* node, 
 	const void* key, compar_t key_cmp);
 
 // tree traversal
-__fastcall void* dftree_iter_recurse_(dfnode* node, void* ctx, dftree_iter_t cb);
-__fastcall void* dftree_iter_rrecurse_(dfnode* node, void* ctx, dftree_iter_t cb);
-
+REGCALL(3) void* dftree_iter_recurse_(dfnode* node, void* ctx, dftree_iter_t cb);
+REGCALL(3) void* dftree_iter_rrecurse_(dfnode* node, void* ctx, dftree_iter_t cb);
