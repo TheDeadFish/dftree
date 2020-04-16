@@ -148,8 +148,13 @@ dftree_insret_t dftree_insert(dftree *rbtree,
 	return {inode, true};
 };
 
-
-
+void dftree_insert(dftree *rbtree, dfnode *inode, compar_t key_cmp)
+{
+	node_list path;
+	dfnode* fnode = path.init(rbtree->root, inode, key_cmp);
+	assert(fnode == NULL);
+	rbtree->root = path.insert(inode);
+}
 
 typedef void* (__fastcall *dftree_iter_t)(void*, dfnode*);
 

@@ -59,6 +59,9 @@ struct dftree { dfnode *root;
 __attribute__((stdcall,regparm(3)))
 dftree_insret_t dftree_insert(dftree *rbtree, void *key, 
 	void* ctx, compar_t key_cmp, dfnode_create_t node_create);
+	
+__attribute__((stdcall,regparm(3))) 
+void dftree_insert(dftree *rbtree, dfnode *node, compar_t key_cmp);
 
 // tree search 
 __fastcall dfnode* dftree_search(dfnode* node, 
