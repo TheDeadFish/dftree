@@ -51,9 +51,11 @@ struct node_list
 	list_t* operator->() { return path; }
 	list_t& operator[](int i) { return path[i]; }
 	
-
 	
-	dfnode* insert(dfnode* inode);
+	bool chk(list_t* x) { 
+		return (x > (list_t*)this); }
+	
+	void insert(dftree* tree, dfnode* inode);
 	
 	dfnode* init(dfnode* node, void* key, compar_t key_cmp);
 };
@@ -73,20 +75,16 @@ dfnode* node_list::init(dfnode* node, void* key, compar_t key_cmp)
 	return node;
 }
 
-dfnode* node_list::insert(dfnode* inode)
+void node_list::insert(dftree* tree, dfnode* inode)
 {
-	list_t* path = this->path;
 	list_t* pathp = this->pathp;
-	VARFIX(path);
-
-	pathp->node = inode;
-	inode->init();	
+	inode->init();
 	
-	while(--pathp >= path)
+	while(chk(--pathp))
 	{
 		dfnode *cnode = pathp->node;
 		if (pathp->cmp < 0) {
-			dfnode *left = pathp[1].node;
+			dfnode *left = inode;
 			cnode->left = left;
 			if (left->color()) {
 				dfnode *leftleft = left->left;
@@ -98,11 +96,10 @@ dfnode* node_list::insert(dfnode* inode)
 					cnode = tnode;
 				}
 			} else {
-				//return {inode, true};
-				break;
+				return;
 			}
 		} else {
-			dfnode *right = pathp[1].node;
+			dfnode *right = inode;
 			cnode->right = right;
 			if (right->color()) {
 				dfnode *left = cnode->left;
@@ -121,15 +118,14 @@ dfnode* node_list::insert(dfnode* inode)
 					cnode = tnode;
 				}
 			} else {
-				//return {inode, true};
-					break;
+				return;
 			}
 		}
-		pathp->node = cnode;
+		inode = cnode;
 	}
-		
-	path->node->black_set();
-	return path->node;
+
+	inode->black_set();
+	tree->root = inode;
 }
 
 dftree_insret_t dftree_insert(dftree *rbtree, 
@@ -144,7 +140,7 @@ dftree_insret_t dftree_insert(dftree *rbtree,
 	// create the node
 	dfnode* inode = (dfnode*)knode;
 	if(node_create) inode = node_create(ctx, knode);
-	rbtree->root = path.insert(inode);
+	path.insert(rbtree, inode);
 	return {inode, true};
 };
 
@@ -153,7 +149,7 @@ void dftree_insert(dftree *rbtree, dfnode *inode, compar_t key_cmp)
 	node_list path;
 	dfnode* fnode = path.init(rbtree->root, inode, key_cmp);
 	assert(fnode == NULL);
-	rbtree->root = path.insert(inode);
+	path.insert(rbtree, inode);
 }
 
 typedef void* (__fastcall *dftree_iter_t)(void*, dfnode*);
