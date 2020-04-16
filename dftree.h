@@ -1,22 +1,47 @@
 #pragma once
 
+// this will go somewhere else later
+template <class T>
+struct TaggedPtr1
+{
+	// construction / assignment
+	TaggedPtr1() {}
+	TaggedPtr1(T* ptr, intptr_t tag=0) : 
+		data(intptr_t(ptr) | tag) {}
+	void operator=(T* p) { ptr_set(p); }
+
+	// pointer access
+	T* operator->() {return ptr();}
+	T& operator*() {return *ptr();}
+	operator T*() {return ptr();}
+	
+	// pointer getters
+	T* ptr() { return (T*)(data & -2); }
+	intptr_t tag() { return data & 1; }
+	void ptr_set(T* ptr) { data = (data&1) | intptr_t(ptr); }
+	void tag_set(intptr_t tag) { data = (data&-2) | tag; }
+	intptr_t data;	
+};
+
+
 struct dfnode {	
   dfnode *left_ptr;	
-  intptr_t right_red;	
+  TaggedPtr1<dfnode> right_red;	
 	
 	// pointer set/get
 	dfnode* left() { return left_ptr; }
-	dfnode* right() { return (dfnode*)(right_red & -2LL); }
+	dfnode* right() { return right_red; }
 	void left_set(dfnode* p) { left_ptr = p; }
-  void right_set(dfnode* p) { right_red = (right_red&1) | (intptr_t)p; }
+  void right_set(dfnode* p) { right_red = p; }
 	
 	// color set/get
-	intptr_t color() { return right_red & 1; } 
-	void color_set(intptr_t c) { right_red = (right_red&-2LL) | (intptr_t)c; }
-  void red_set() { right_red |= 1; } void black_set() { right_red &= -2LL; }	
+	intptr_t color() { return right_red.tag(); } 
+	void color_set(intptr_t c) { right_red.tag_set(c); }
+  void red_set() { right_red.tag_set(1); } 
+	void black_set() { right_red.tag_set(0); }	
 
-  void init() { left_ptr = 0; right_red = 1; }
-	void set_right_red(dfnode* p, intptr_t c) { right_red = (intptr_t)p | c; }
+  void init() { left_ptr = 0; right_red = {0,1}; }
+	void set_right_red(dfnode* p, intptr_t c) { right_red = {p, c}; }
 	
 	
 	template <class T> auto* cont(T x) {

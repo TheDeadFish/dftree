@@ -35,22 +35,33 @@
 		(r_node)->right_set((a_node));		\
 } while (0)
 
-
-dftree_insret_t dftree_insert(dftree *rbtree, 
-	void *knode, void* ctx, compar_t key_cmp,
-	dfnode* (__fastcall *node_create)(void* ctx, void *key))
+struct node_list
 {
-
-	struct {
-		dfnode *node;
-		int cmp;
-	} path[sizeof(void *) << 4], *pathp;
+	struct list_t { dfnode *node; int cmp; };
+	list_t* pathp;
 	
+	list_t path[sizeof(void*)*14];
+	
+	
+	template <class T>
+	operator T() { return (T)path; }
+	list_t* operator->() { return path; }
+	list_t& operator[](int i) { return path[i]; }
+	
+
+	
+	dfnode* insert(dfnode* inode);
+	
+	dfnode* init(dfnode* node, void* key, compar_t key_cmp);
+};
+
+dfnode* node_list::init(dfnode* node, void* key, compar_t key_cmp)
+{
 	// locate insertion point
-	path->node = rbtree->root;
+	path->node = node;
 	for (pathp = path; pathp->node != NULL; pathp++) {
-		int cmp = pathp->cmp = key_cmp(knode, pathp->node);
-		if(cmp == 0) return {pathp->node, false};
+		int cmp = pathp->cmp = key_cmp(key, pathp->node);
+		if(cmp == 0) return {pathp->node};
 		if (cmp < 0) {
 			pathp[1].node = pathp->node->left();
 		} else {
@@ -58,11 +69,14 @@ dftree_insret_t dftree_insert(dftree *rbtree,
 		}
 	}
 	
-	// create the node
-	dfnode* inode = (dfnode*)knode;
-	if(node_create) inode = node_create(ctx, knode);
-	pathp->node = inode; inode->init();
+	return NULL;
+}
 
+dfnode* node_list::insert(dfnode* inode)
+{
+	pathp->node = inode;
+	inode->init();
+	
 	for (pathp--; (uintptr_t)pathp >= (uintptr_t)path; pathp--) {
 		dfnode *cnode = pathp->node;
 		if (pathp->cmp < 0) {
@@ -78,7 +92,8 @@ dftree_insret_t dftree_insert(dftree *rbtree,
 					cnode = tnode;
 				}
 			} else {
-				return {inode, true};
+				//return {inode, true};
+				break;
 			}
 		} else {
 			dfnode *right = pathp[1].node;
@@ -100,14 +115,30 @@ dftree_insret_t dftree_insert(dftree *rbtree,
 					cnode = tnode;
 				}
 			} else {
-				return {inode, true};
+				//return {inode, true};
+					break;
 			}
 		}
 		pathp->node = cnode;
 	}
+		
+	path->node->black_set();
+	return path->node;
+}
 
-	rbtree->root = path->node;
-	rbtree->root->black_set();
+dftree_insret_t dftree_insert(dftree *rbtree, 
+	void *knode, void* ctx, compar_t key_cmp,
+	dfnode* (__fastcall *node_create)(void* ctx, void *key))
+{
+	// find the node
+	node_list path;
+	dfnode* node = path.init(rbtree->root, knode, key_cmp);
+	if(node) return {node, false};
+	
+	// create the node
+	dfnode* inode = (dfnode*)knode;
+	if(node_create) inode = node_create(ctx, knode);
+	rbtree->root = path.insert(inode);
 	return {inode, true};
 };
 
