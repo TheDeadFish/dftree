@@ -36,8 +36,8 @@ void traversi(dfnode* node, int depth)
 	
 		
 	
-	traversi(node->left(), depth+1);
-	traversi(node->right(), depth+1);
+	traversi(node->left, depth+1);
+	traversi(node->right, depth+1);
 	
 	
 	

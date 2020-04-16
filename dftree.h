@@ -27,23 +27,17 @@ struct TaggedPtr1
 
 
 struct dfnode {	
-  dfnode *left_ptr;	
-  TaggedPtr1<dfnode> right_red;	
-	
-	// pointer set/get
-	dfnode* left() { return left_ptr; }
-	dfnode* right() { return right_red; }
-	void left_set(dfnode* p) { left_ptr = p; }
-  void right_set(dfnode* p) { right_red = p; }
+  dfnode *left;	
+  TaggedPtr1<dfnode> right;	
 	
 	// color set/get
-	intptr_t color() { return right_red.tag(); } 
-	void color_set(intptr_t c) { right_red.tag_set(c); }
-  void red_set() { right_red.tag_set(1); } 
-	void black_set() { right_red.tag_set(0); }	
+	intptr_t color() { return right.tag(); } 
+	void color_set(intptr_t c) { right.tag_set(c); }
+  void red_set() { right.tag_set(1); } 
+	void black_set() { right.tag_set(0); }	
 
-  void init() { left_ptr = 0; right_red = {0,1}; }
-	void set_right_red(dfnode* p, intptr_t c) { right_red = {p, c}; }
+  void init() { left = 0; right = {0,1}; }
+	void set_right(dfnode* p, intptr_t c) { right = {p, c}; }
 	
 	
 	template <class T> auto* cont(T x) {

@@ -11,8 +11,8 @@
     (r_node) = (a_root);						\
     if ((r_node) != NULL) {						\
 	for (;								\
-	  (r_node)->left() != NULL;		\
-	  (r_node) = (r_node)->left()) {	\
+	  (r_node)->left != NULL;		\
+	  (r_node) = (r_node)->left) {	\
 	}								\
     }									\
 } while (0)
@@ -20,22 +20,22 @@
 #define rbtn_last(a_rbt, a_root, r_node) do {		\
     (r_node) = (a_root);						\
     if ((r_node) != NULL) {						\
-	for (; (r_node)->right() != NULL;	\
-	  (r_node) = (r_node)->right()) {	\
+	for (; (r_node)->right != NULL;	\
+	  (r_node) = (r_node)->right) {	\
 	}								\
     }									\
 } while (0)
 
 #define rbtn_rotate_left(a_node, r_node) do {		\
-    (r_node) = (a_node)->right();		\
-    (a_node)->right_set((r_node)->left());			\
-    (r_node)->left_set((a_node));			\
+    (r_node) = (a_node)->right;		\
+    (a_node)->right = (r_node)->left;			\
+    (r_node)->left = (a_node);			\
 } while (0)
 
 #define rbtn_rotate_right(a_node, r_node) do {		\
-    (r_node) = (a_node)->left();		\
-    (a_node)->left_set((r_node)->right()); \
-		(r_node)->right_set((a_node));		\
+    (r_node) = (a_node)->left;		\
+    (a_node)->left = (r_node)->right; \
+		(r_node)->right = (a_node);		\
 } while (0)
 
 struct node_list
@@ -65,8 +65,8 @@ dfnode* node_list::init(dfnode* node, void* key, compar_t key_cmp)
 	{
 		int cmp = pathp->cmp = key_cmp(key, pathp->node);
 		if(cmp == 0) break;
-		if (cmp < 0) { node = node->left();
-		} else { node = node->right(); }
+		if (cmp < 0) { node = node->left;
+		} else { node = node->right; }
 	}
 	
 	this->pathp = pathp;
@@ -87,9 +87,9 @@ dfnode* node_list::insert(dfnode* inode)
 		dfnode *cnode = pathp->node;
 		if (pathp->cmp < 0) {
 			dfnode *left = pathp[1].node;
-			cnode->left_set(left);
+			cnode->left = left;
 			if (left->color()) {
-				dfnode *leftleft = left->left();
+				dfnode *leftleft = left->left;
 				if (leftleft != NULL && leftleft->color()) {
 
 					dfnode *tnode;
@@ -103,9 +103,9 @@ dfnode* node_list::insert(dfnode* inode)
 			}
 		} else {
 			dfnode *right = pathp[1].node;
-			cnode->right_set(right);
+			cnode->right = right;
 			if (right->color()) {
-				dfnode *left = cnode->left();
+				dfnode *left = cnode->left;
 				if (left != NULL && left->color()) {
 
 					left->black_set();
@@ -157,18 +157,18 @@ __fastcall void* dftree_iter_recurse_(
 	dfnode* node, void* ctx, dftree_iter_t cb)
 {
 	if(!node) return node;
-	IFRET(dftree_iter_recurse_(node->left(), ctx, cb));
+	IFRET(dftree_iter_recurse_(node->left, ctx, cb));
 	IFRET(cb(ctx, node));
-	return dftree_iter_recurse_(node->right(), ctx, cb);
+	return dftree_iter_recurse_(node->right, ctx, cb);
 }
 
 __fastcall void* dftree_iter_rrecurse_(
 	dfnode* node, void* ctx, dftree_iter_t cb)
 {
 	if(!node) return node;
-	IFRET(dftree_iter_recurse_(node->right(), ctx, cb));
+	IFRET(dftree_iter_recurse_(node->right, ctx, cb));
 	IFRET(cb(ctx, node));
-	return dftree_iter_recurse_(node->left(), ctx, cb);
+	return dftree_iter_recurse_(node->left, ctx, cb);
 }
 
 
@@ -178,9 +178,9 @@ dfnode* dftree_search(dfnode* node,
 {
 	while (node != NULL) {
 		int cmp = key_cmp(key, node);
-		if(cmp > 0) node = node->right();
+		if(cmp > 0) node = node->right;
 		else { if(!cmp) break;
-			node = node->left(); }
+			node = node->left; }
 	}
 	return node;
 }
@@ -191,9 +191,9 @@ dfnode* dftree_nsearch(dfnode* node,
 	dfnode* ret = NULL;
 	while (node != NULL) {
 		int cmp = key_cmp(key, node);
-		if(cmp > 0) node = node->right();
+		if(cmp > 0) node = node->right;
 		else { ret = node; if(!cmp) break;
-			node = node->left(); }
+			node = node->left; }
 	}
 	return ret;
 }
@@ -204,9 +204,9 @@ dfnode* dftree_psearch(dfnode* node,
 	dfnode* ret = NULL;
 	while (node != NULL) {
 		int cmp = key_cmp(key, node);
-		if(cmp < 0) node = node->left();
+		if(cmp < 0) node = node->left;
 		else { ret = node; if(!cmp) break;
-			node = node->right(); }
+			node = node->right; }
 	}
 	return ret;
 }
