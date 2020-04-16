@@ -1,5 +1,7 @@
 #pragma once
 
+typedef int (*compar_t)(const void*,const void*);
+
 // this will go somewhere else later
 template <class T>
 struct TaggedPtr1

@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <assert.h>
-#include "stuff.h"
 #include "dftree.h"
+
+// stdshit bits
+#define IFRET(...) ({ if(auto x = __VA_ARGS__) return x; })
+#define VARFIX(x) asm("" : "+r"(x))
 
 /* Internal utility macros. */
 #define rbtn_first(a_rbt, a_root, r_node) do {		\
@@ -72,10 +75,15 @@ dfnode* node_list::init(dfnode* node, void* key, compar_t key_cmp)
 
 dfnode* node_list::insert(dfnode* inode)
 {
+	list_t* path = this->path;
+	list_t* pathp = this->pathp;
+	VARFIX(path);
+
 	pathp->node = inode;
-	inode->init();
+	inode->init();	
 	
-	for (pathp--; (uintptr_t)pathp >= (uintptr_t)path; pathp--) {
+	while(--pathp >= path)
+	{
 		dfnode *cnode = pathp->node;
 		if (pathp->cmp < 0) {
 			dfnode *left = pathp[1].node;
