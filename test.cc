@@ -85,5 +85,29 @@ int main()
 	dftree_iter(tree.root, 0, trav_cb);
 	
 	
+	/*dftree_path path;
+	
+	for(int i = 0; i < 50; i += 5) {
+		node_s tmp; tmp.key = i;
+		auto x = path.initn(tree, &tmp.link, COMPAR(node_cmp));
+		
+		printf("%d: %d, %d\n", i, 
+			(x.node ? (((node_s*)(x.node))->key) : -1),
+			(x.next ? (((node_s*)(x.next))->key) : -1)
+			
+		);
+		
+		
+		
+	
+	
+	
+	
+	
+	}
+	*/
+	
+	
+	
 }
 

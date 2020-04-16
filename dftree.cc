@@ -38,29 +38,9 @@
 		(r_node)->right = (a_node);		\
 } while (0)
 
-struct node_list
-{
-	struct list_t { dfnode *node; int cmp; };
-	list_t* pathp;
-	
-	list_t path[sizeof(void*)*14];
-	
-	
-	template <class T>
-	operator T() { return (T)path; }
-	list_t* operator->() { return path; }
-	list_t& operator[](int i) { return path[i]; }
-	
-	
-	bool chk(list_t* x) { 
-		return (x > (list_t*)this); }
-	
-	void insert(dftree* tree, dfnode* inode);
-	
-	dfnode* init(dfnode* node, void* key, compar_t key_cmp);
-};
 
-dfnode* node_list::init(dfnode* node, void* key, compar_t key_cmp)
+
+dfnode* dftree_path::init(dfnode* node, void* key, compar_t key_cmp)
 {
 	list_t* pathp = path;
 	for(; pathp->node = node; pathp++) 
@@ -75,7 +55,7 @@ dfnode* node_list::init(dfnode* node, void* key, compar_t key_cmp)
 	return node;
 }
 
-void node_list::insert(dftree* tree, dfnode* inode)
+void dftree_path::insert(dftree* tree, dfnode* inode)
 {
 	list_t* pathp = this->pathp;
 	inode->init();
@@ -133,7 +113,7 @@ dftree_insret_t dftree_insert(dftree *rbtree,
 	dfnode* (__fastcall *node_create)(void* ctx, void *key))
 {
 	// find the node
-	node_list path;
+	dftree_path path;
 	dfnode* node = path.init(rbtree->root, knode, key_cmp);
 	if(node) return {node, false};
 	
@@ -146,7 +126,7 @@ dftree_insret_t dftree_insert(dftree *rbtree,
 
 void dftree_insert(dftree *rbtree, dfnode *inode, compar_t key_cmp)
 {
-	node_list path;
+	dftree_path path;
 	dfnode* fnode = path.init(rbtree->root, inode, key_cmp);
 	assert(fnode == NULL);
 	path.insert(rbtree, inode);

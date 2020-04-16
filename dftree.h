@@ -77,3 +77,16 @@ REGCALL(3) dfnode* dftree_psearch(dfnode* node,
 // tree traversal
 REGCALL(3) void* dftree_iter_recurse_(dfnode* node, void* ctx, dftree_iter_t cb);
 REGCALL(3) void* dftree_iter_rrecurse_(dfnode* node, void* ctx, dftree_iter_t cb);
+
+
+struct dftree_path
+{
+	struct list_t { dfnode *node; int cmp; };
+	list_t* pathp; list_t path[sizeof(void*)*14];
+
+	bool chk(list_t* x) { return (x > (list_t*)this); }
+	
+	void insert(dftree* tree, dfnode* inode);
+	
+	dfnode* init(dfnode* node, void* key, compar_t key_cmp);
+};
