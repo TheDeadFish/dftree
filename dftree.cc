@@ -55,6 +55,21 @@ dfnode* dftree_path::init(dfnode* node, void* key, compar_t key_cmp)
 	return node;
 }
 
+dftree_path::found_t dftree_path::ninit(dfnode* node, void* key, compar_t key_cmp)
+{	
+	dfnode* ret = NULL;
+	list_t* pathp = path;
+	for(; pathp->node = node; pathp++) 
+	{
+		int cmp = pathp->cmp = key_cmp(key, node);
+		if(cmp > 0) node = node->right;
+		else { ret = node; if(!cmp) return {node, 1};
+			node = node->left; }
+	}
+	
+	this->pathp = pathp;
+	return {ret, 0};
+}
 void dftree_path::insert(dftree* tree, dfnode* inode)
 {
 	list_t* pathp = this->pathp;

@@ -89,4 +89,6 @@ struct dftree_path
 	void insert(dftree* tree, dfnode* inode);
 	
 	dfnode* init(dfnode* node, void* key, compar_t key_cmp);
+	struct found_t { dfnode* node; bool found; };
+	found_t ninit(dfnode* node, void* key, compar_t key_cmp);
 };

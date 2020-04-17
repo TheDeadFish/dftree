@@ -65,6 +65,11 @@ void* dftree_iter(dfnode* node, void* ctx, T cb) {
 
 
 
+static 
+int compar(int key, node_s* node) { return key - node->key; }
+
+
+
 
 int main()
 {
@@ -75,37 +80,31 @@ int main()
 	dftree tree = {};
 
 	for(int i = 0; i < 20; i++) {
-		nodes[i].key = i*10;
+		nodes[i*2+0].key = i*10;
 		
 		dftree_insert(&tree, &nodes[i].link, 0, COMPAR(node_cmp), 0);
+		nodes[i*2+1].key = -i*10;
+		dftree_insert(&tree, &nodes[i].link, 0, COMPAR(node_cmp), 0);
+		
 	}
 	
 	traversi(tree.root, 0);
 	
 	dftree_iter(tree.root, 0, trav_cb);
 	
+	printf("hello\n");
 	
-	/*dftree_path path;
+	
+	dftree_path path;
 	
 	for(int i = 0; i < 50; i += 5) {
-		node_s tmp; tmp.key = i;
-		auto x = path.initn(tree, &tmp.link, COMPAR(node_cmp));
-		
+		auto x = path.ninit(tree, (void*)i, COMPAR(compar));
+
 		printf("%d: %d, %d\n", i, 
-			(x.node ? (((node_s*)(x.node))->key) : -1),
-			(x.next ? (((node_s*)(x.next))->key) : -1)
-			
-		);
-		
-		
-		
-	
-	
-	
-	
-	
+			(x.node ? (((node_s*)(x.node))->key) : -1), x.found);
+
 	}
-	*/
+	
 	
 	
 	
